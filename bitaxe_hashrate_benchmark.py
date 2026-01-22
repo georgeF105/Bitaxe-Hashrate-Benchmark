@@ -4,6 +4,7 @@ import json
 import signal
 import sys
 import argparse
+import os
 from datetime import datetime
 START_TIME = datetime.now().strftime("%Y-%m-%d_%H")
 
@@ -21,23 +22,44 @@ RESET = "\033[0m"
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Bitaxe Hashrate Benchmark Tool')
     parser.add_argument('bitaxe_ip', nargs='?', help='IP address of the Bitaxe (e.g., 192.168.2.26)')
-    parser.add_argument('-v', '--voltage', type=int, default=1150,
-                       help='Initial voltage in mV (default: 1150)')
-    parser.add_argument('-f', '--frequency', type=int, default=500,
-                       help='Initial frequency in MHz (default: 500)')
-    parser.add_argument('--sleep-time', type=int, default=90,
-                       help='Seconds to wait before starting the benchmark (default: 90)')
-    parser.add_argument('--benchmark-time', type=int, default=600,
-                       help='Benchmark duration in seconds (default: 600)')
-    parser.add_argument('--sample-interval', type=int, default=15,
-                       help='Sampling interval in seconds (default: 15)')
-    
-    # If no arguments are provided, print help and exit
-    if len(sys.argv) == 1:
-        parser.print_help()
+    parser.add_argument('-v', '--voltage', type=int,
+                        help='Initial voltage in mV (default: 1150)')
+    parser.add_argument('-f', '--frequency', type=int,
+                        help='Initial frequency in MHz (default: 500)')
+    parser.add_argument('--sleep-time', type=int,
+                        help='Seconds to wait before starting the benchmark (default: 90)')
+    parser.add_argument('--benchmark-time', type=int,
+                        help='Benchmark duration in seconds (default: 600)')
+    parser.add_argument('--sample-interval', type=int,
+                        help='Sampling interval in seconds (default: 15)')
+
+    args = parser.parse_args()
+
+    def get_env_int(env_name, cli_value, default):
+        env_value = os.environ.get(env_name)
+        if env_value is not None and env_value != "":
+            try:
+                return int(env_value)
+            except ValueError:
+                print(RED + f"Error: {env_name} must be an integer." + RESET)
+                sys.exit(1)
+        if cli_value is not None:
+            return cli_value
+        return default
+
+    env_ip = os.environ.get("BITAXE_IP")
+    args.bitaxe_ip = env_ip or args.bitaxe_ip
+    if not args.bitaxe_ip:
+        print(RED + "Error: bitaxe_ip is required. Provide it via BITAXE_IP or the CLI." + RESET)
         sys.exit(1)
-    
-    return parser.parse_args()
+
+    args.voltage = get_env_int("BITAXE_VOLTAGE", args.voltage, 1150)
+    args.frequency = get_env_int("BITAXE_FREQUENCY", args.frequency, 500)
+    args.sleep_time = get_env_int("BITAXE_SLEEP_TIME", args.sleep_time, 90)
+    args.benchmark_time = get_env_int("BITAXE_BENCHMARK_TIME", args.benchmark_time, 600)
+    args.sample_interval = get_env_int("BITAXE_SAMPLE_INTERVAL", args.sample_interval, 15)
+
+    return args
 
 # Replace the configuration section
 args = parse_arguments()
