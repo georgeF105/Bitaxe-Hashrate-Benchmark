@@ -25,6 +25,12 @@ def parse_arguments():
                        help='Initial voltage in mV (default: 1150)')
     parser.add_argument('-f', '--frequency', type=int, default=500,
                        help='Initial frequency in MHz (default: 500)')
+    parser.add_argument('--sleep-time', type=int, default=90,
+                       help='Seconds to wait before starting the benchmark (default: 90)')
+    parser.add_argument('--benchmark-time', type=int, default=600,
+                       help='Benchmark duration in seconds (default: 600)')
+    parser.add_argument('--sample-interval', type=int, default=15,
+                       help='Sampling interval in seconds (default: 15)')
     
     # If no arguments are provided, print help and exit
     if len(sys.argv) == 1:
@@ -42,9 +48,9 @@ initial_frequency = args.frequency
 # Configuration
 voltage_increment = 20
 frequency_increment = 25
-sleep_time = 90               # Wait 90 seconds before starting the benchmark
-benchmark_time = 600          # 10 minutes benchmark time
-sample_interval = 15          # 15 seconds sample interval
+sleep_time = args.sleep_time   # Wait 90 seconds before starting the benchmark
+benchmark_time = args.benchmark_time  # 10 minutes benchmark time
+sample_interval = args.sample_interval  # 15 seconds sample interval
 max_temp = 66                 # Will stop if temperature reaches or exceeds this value
 max_allowed_voltage = 1400    # Maximum allowed core voltage
 max_allowed_frequency = 1200  # Maximum allowed core frequency

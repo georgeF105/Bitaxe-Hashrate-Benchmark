@@ -1,0 +1,29 @@
+{
+  "name": "Bitaxe Hashrate Benchmark",
+  "slug": "bitaxe-hashrate-benchmark",
+  "version": "0.1.0",
+  "arch": [
+    "aarch64",
+    "amd64",
+    "armhf",
+    "armv7",
+    "i386"
+  ],
+  "startup": "application",
+  "options": {
+    "bitaxe_ip": "",
+    "voltage": 1150,
+    "frequency": 500,
+    "sleep_time": 90,
+    "benchmark_time": 600,
+    "sample_interval": 15
+  },
+  "schema": {
+    "bitaxe_ip": "str",
+    "voltage": "int(1000,1400)",
+    "frequency": "int(400,1200)",
+    "sleep_time": "int(0,600)",
+    "benchmark_time": "int(120,3600)",
+    "sample_interval": "int(5,120)"
+  }
+}
