@@ -26,6 +26,8 @@ def parse_arguments():
                         help='Initial voltage in mV (default: 1150)')
     parser.add_argument('-f', '--frequency', type=int,
                         help='Initial frequency in MHz (default: 500)')
+    parser.add_argument('--results-dir',
+                        help='Directory to write results files (default: /data)')
     parser.add_argument('--sleep-time', type=int,
                         help='Seconds to wait before starting the benchmark (default: 90)')
     parser.add_argument('--benchmark-time', type=int,
@@ -58,6 +60,7 @@ def parse_arguments():
     args.sleep_time = get_env_int("BITAXE_SLEEP_TIME", args.sleep_time, 90)
     args.benchmark_time = get_env_int("BITAXE_BENCHMARK_TIME", args.benchmark_time, 600)
     args.sample_interval = get_env_int("BITAXE_SAMPLE_INTERVAL", args.sample_interval, 15)
+    args.results_dir = os.environ.get("RESULTS_DIR") or args.results_dir or "/data"
 
     return args
 
@@ -66,6 +69,7 @@ args = parse_arguments()
 bitaxe_ip = f"http://{args.bitaxe_ip}"
 initial_voltage = args.voltage
 initial_frequency = args.frequency
+results_dir = args.results_dir
 
 # Configuration
 voltage_increment = 20
@@ -384,9 +388,11 @@ def save_results():
         # Extract IP from bitaxe_ip global variable and remove 'http://'
         ip_address = bitaxe_ip.replace('http://', '')
         filename = f"bitaxe_benchmark_results_{ip_address}_{START_TIME}.json"
-        with open(filename, "w") as f:
+        os.makedirs(results_dir, exist_ok=True)
+        file_path = os.path.join(results_dir, filename)
+        with open(file_path, "w") as f:
             json.dump(results, f, indent=4)
-        print(GREEN + f"Results saved to {filename}" + RESET)
+        print(GREEN + f"Results saved to {file_path}" + RESET)
         print()  # Add empty line
         
     except IOError as e:
@@ -522,7 +528,9 @@ finally:
         # Save the final data to JSON
         ip_address = bitaxe_ip.replace('http://', '')
         filename = f"bitaxe_benchmark_results_{ip_address}_{START_TIME}.json"
-        with open(filename, "w") as f:
+        os.makedirs(results_dir, exist_ok=True)
+        file_path = os.path.join(results_dir, filename)
+        with open(file_path, "w") as f:
             json.dump(final_data, f, indent=4)
         
         print(GREEN + "Benchmarking completed." + RESET)
