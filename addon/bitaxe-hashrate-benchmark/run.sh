@@ -15,6 +15,13 @@ fi
 
 bashio::log.info "Starting Bitaxe Hashrate Benchmark for ${bitaxe_ip}."
 
+export BITAXE_IP="${bitaxe_ip}"
+export BITAXE_VOLTAGE="${voltage}"
+export BITAXE_FREQUENCY="${frequency}"
+export BITAXE_SLEEP_TIME="${sleep_time}"
+export BITAXE_BENCHMARK_TIME="${benchmark_time}"
+export BITAXE_SAMPLE_INTERVAL="${sample_interval}"
+
 exec python3 /app/bitaxe_hashrate_benchmark.py \
   "${bitaxe_ip}" \
   --voltage "${voltage}" \
